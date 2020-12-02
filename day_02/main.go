@@ -1,4 +1,4 @@
-//advent of code 2020, day 2, part 1 and 2
+//advent of code 2020, day 02, part 1 and 2
 package main
 
 import (
