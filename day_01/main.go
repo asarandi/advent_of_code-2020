@@ -8,37 +8,47 @@ import (
 	"strings"
 )
 
-func main() {
-	data, err := ioutil.ReadFile("input.txt")
-	if err != nil {
-		panic(err)
-	}
-	nums := make(map[int]bool)
-	for _, line := range strings.Split(strings.TrimSpace(string(data)), "\n") {
-		n, err := strconv.Atoi(line)
-		if err != nil {
-			panic(err)
-		}
-		nums[n] = true
-	}
+var nums = make(map[int]bool)
+
+func part1() int {
 	for n := range nums {
 		x := 2020 - n
 		if _, ok := nums[x]; ok {
-			fmt.Println("part 1:", n*x)
-			break
+			return n * x
 		}
 	}
-loop:
+	return -1
+}
+
+func part2() int {
 	for n := range nums {
 		for m := range nums {
 			if n == m {
 				continue
 			}
 			x := 2020 - (n + m)
-			if _, ok := nums[x]; ok {
-				fmt.Println("part 2:", n*m*x)
-				break loop
+			_, ok := nums[x]
+			if ok {
+				return n * m * x
 			}
 		}
 	}
+	return -1
+}
+
+func main() {
+	data, err := ioutil.ReadFile("input.txt")
+	if err != nil {
+		panic(err)
+	}
+	lines := strings.TrimSpace(string(data))
+	for _, line := range strings.Split(lines, "\n") {
+		n, err := strconv.Atoi(line)
+		if err != nil {
+			panic(err)
+		}
+		nums[n] = true
+	}
+	fmt.Println("part 1:", part1())
+	fmt.Println("part 2:", part2())
 }
