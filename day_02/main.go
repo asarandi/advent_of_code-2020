@@ -29,13 +29,8 @@ func part1() (res int) {
 
 func part2() (res int) {
 	for p := range puzzle {
-		a, b := false, false
-		for i, c := range p.s {
-			if c == p.c {
-				a = a || p.a == i+1
-				b = b || p.b == i+1
-			}
-		}
+		a := rune(p.s[p.a-1]) == p.c
+		b := rune(p.s[p.b-1]) == p.c
 		if a != b {
 			res++
 		}
