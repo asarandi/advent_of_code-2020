@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 )
 
-type pos struct {
+type vec2i struct {
 	x, y int
 }
 
@@ -17,22 +17,22 @@ func main() {
 		panic(err)
 	}
 	grid := bytes.Split(bytes.TrimSpace(data), []byte{10})
-	res := make([]int, 0)
-	for _, p := range []pos{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}} {
-		y, x, count := p.y, p.x, 0
+	part1, part2 := 0, 1
+	slopes := []vec2i{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
+	for i, vec := range slopes {
+		y, x, count := vec.y, vec.x, 0
 		for y < len(grid) {
 			if grid[y][x] == '#' {
 				count++
 			}
-			y += p.y
-			x = (x + p.x) % len(grid[0])
+			y += vec.y
+			x = (x + vec.x) % len(grid[0])
 		}
-		res = append(res, count)
+		if i == 1 {
+			part1 = count
+		}
+		part2 *= count
 	}
-	p1, p2 := res[1], 1
-	for _, val := range res {
-		p2 *= val
-	}
-	fmt.Println("part 1:", p1)
-	fmt.Println("part 2:", p2)
+	fmt.Println("part 1:", part1)
+	fmt.Println("part 2:", part2)
 }
