@@ -11,28 +11,42 @@ type vec2i struct {
 	x, y int
 }
 
+var grid [][]byte
+
+func part1() (res int) {
+	n, m := len(grid), len(grid[0])
+	for y, x := 1, 3; y < n; {
+		if grid[y][x] == '#' {
+			res++
+		}
+		y, x = y+1, (x+3)%m
+	}
+	return
+}
+
+func part2() (res int) {
+	slopes := []vec2i{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
+	n, m := len(grid), len(grid[0])
+	res = 1
+	for _, v := range slopes {
+		y, x, count := v.y, v.x, 0
+		for y < n {
+			if grid[y][x] == '#' {
+				count++
+			}
+			y, x = y+v.y, (x+v.x)%m
+		}
+		res *= count
+	}
+	return
+}
+
 func main() {
 	data, err := ioutil.ReadFile("input.txt")
 	if err != nil {
 		panic(err)
 	}
-	grid := bytes.Split(bytes.TrimSpace(data), []byte{10})
-	part1, part2 := 0, 1
-	slopes := []vec2i{{1, 1}, {3, 1}, {5, 1}, {7, 1}, {1, 2}}
-	for i, vec := range slopes {
-		y, x, count := vec.y, vec.x, 0
-		for y < len(grid) {
-			if grid[y][x] == '#' {
-				count++
-			}
-			y += vec.y
-			x = (x + vec.x) % len(grid[0])
-		}
-		if i == 1 {
-			part1 = count
-		}
-		part2 *= count
-	}
-	fmt.Println("part 1:", part1)
-	fmt.Println("part 2:", part2)
+	grid = bytes.Split(bytes.TrimSpace(data), []byte{10})
+	fmt.Println("part 1:", part1())
+	fmt.Println("part 2:", part2())
 }
