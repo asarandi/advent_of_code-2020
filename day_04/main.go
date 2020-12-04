@@ -10,17 +10,11 @@ import (
 	"strings"
 )
 
-var fields = map[string]func(string) bool{
-	"byr": byr,
-	"iyr": iyr,
-	"eyr": eyr,
-	"hgt": hgt,
-	"hcl": hcl,
-	"ecl": ecl,
-	"pid": pid,
-}
-
 var passports []map[string]string
+
+var fields = map[string]func(string) bool{
+	"byr": byr, "iyr": iyr, "eyr": eyr, "hgt": hgt, "hcl": hcl, "ecl": ecl, "pid": pid,
+}
 
 func part1() (res int) {
 loop:
@@ -58,11 +52,8 @@ func main() {
 	split := bytes.Split(bytes.TrimSpace(data), []byte("\n\n"))
 	passports = make([]map[string]string, 0)
 	for _, item := range split {
-		prep := bytes.Split(item, []byte("\n"))
-		join := bytes.Join(prep, []byte(" "))
-		tokens := strings.Split(string(join), " ")
 		pass := make(map[string]string)
-		for _, tok := range tokens {
+		for _, tok := range strings.Fields(string(item)) {
 			key := strings.Split(tok, ":")[0]
 			value := strings.Split(tok, ":")[1]
 			pass[key] = value
@@ -73,28 +64,27 @@ func main() {
 	fmt.Println("part 2:", part2())
 }
 
-/*
-*
- */
-
 func byr(s string) bool {
-	return isrange(s, 1920, 2002)
+	return regexp.MustCompile(`^[\d]{4}$`).MatchString(s) &&
+		isrange(s, 1920, 2002)
 }
 
 func iyr(s string) bool {
-	return isrange(s, 2010, 2020)
+	return regexp.MustCompile(`^[\d]{4}$`).MatchString(s) &&
+		isrange(s, 2010, 2020)
 }
 
 func eyr(s string) bool {
-	return isrange(s, 2020, 2030)
+	return regexp.MustCompile(`^[\d]{4}$`).MatchString(s) &&
+		isrange(s, 2020, 2030)
 }
 
 func hcl(s string) bool {
-	return s[0] == '#' && isalnum(s[1:])
+	return regexp.MustCompile(`^#[0-9a-f]{6}$`).MatchString(s)
 }
 
 func pid(s string) bool {
-	return len(s) == 9 && isdigit(s)
+	return regexp.MustCompile(`^[\d]{9}$`).MatchString(s)
 }
 
 func hgt(s string) (res bool) {
@@ -106,33 +96,13 @@ func hgt(s string) (res bool) {
 }
 
 func ecl(s string) bool {
-	colors := map[string]bool{
-		"amb": true,
-		"blu": true,
-		"brn": true,
-		"gry": true,
-		"grn": true,
-		"hzl": true,
-		"oth": true,
-	}
-	_, ok := colors[s]
-	return ok
+	return regexp.MustCompile(`^(amb|blu|brn|gry|grn|hzl|oth)$`).MatchString(s)
 }
-
-/*
-*
- */
-
-var isdigit = regexp.MustCompile(`^[0-9]+$`).MatchString
-var islower = regexp.MustCompile(`^[a-z]+$`).MatchString
-var isupper = regexp.MustCompile(`^[A-Z]+$`).MatchString
-var isalpha = regexp.MustCompile(`^[a-zA-Z]+$`).MatchString
-var isalnum = regexp.MustCompile(`^[a-zA-Z0-9]+$`).MatchString
 
 func isrange(s string, min, max int) bool {
 	n, err := strconv.Atoi(s)
 	if err != nil {
 		panic(err)
 	}
-	return n >= min && n <= max
+	return min <= n && n <= max
 }
