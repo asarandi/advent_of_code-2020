@@ -8,20 +8,20 @@ import (
 
 type ins struct {
 	op  string
-	val int
+	arg int
 }
 
-var prog = []ins{}
+var bootcode = []ins{}
 
 func run() (acc, pc int) {
-	seen := make([]bool, len(prog))
-	for pc < len(prog) && !seen[pc] {
+	seen := make([]bool, len(bootcode))
+	for pc < len(bootcode) && !seen[pc] {
 		seen[pc] = true
-		switch prog[pc].op {
+		switch bootcode[pc].op {
 		case "jmp":
-			pc += prog[pc].val
+			pc += bootcode[pc].arg
 		case "acc":
-			acc += prog[pc].val
+			acc += bootcode[pc].arg
 			fallthrough
 		default:
 			pc += 1
@@ -36,15 +36,16 @@ func part1() int {
 }
 
 func part2() int {
-	swap := map[string]string{"jmp": "nop", "nop": "jmp"}
-	for i := range prog {
-		if val, ok := swap[prog[i].op]; ok {
-			prog[i].op = val
+	changes := map[string]string{"jmp": "nop", "nop": "jmp"}
+	for i := range bootcode {
+		newOp, ok := changes[bootcode[i].op]
+		if ok {
+			bootcode[i].op = newOp
 			acc, pc := run()
-			if pc >= len(prog) {
+			bootcode[i].op = changes[newOp] //restore
+			if pc >= len(bootcode) {
 				return acc
 			}
-			prog[i].op = swap[val]
 		}
 	}
 	return 0
@@ -54,11 +55,11 @@ func main() {
 	fp, _ := os.Open("input.txt")
 	for {
 		i := ins{}
-		_, err := fmt.Fscanf(fp, "%s %d\n", &i.op, &i.val)
+		_, err := fmt.Fscanf(fp, "%s %d\n", &i.op, &i.arg)
 		if err != nil {
 			break
 		}
-		prog = append(prog, i)
+		bootcode = append(bootcode, i)
 	}
 	fmt.Println("part 1:", part1())
 	fmt.Println("part 2:", part2())
