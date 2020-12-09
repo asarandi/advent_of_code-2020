@@ -35,20 +35,19 @@ func part1() int {
 }
 
 func part2(search int) int {
-
-	var sum = func(slice []int) (res int) {
-		for _, val := range slice {
-			res += val
-		}
-		return
-	}
-
 	for w := 2; w < len(numbers); w++ {
-		for i := 0; i+w < len(numbers); i++ {
-			window := numbers[i : i+w]
-			if sum(window) == search {
-				sort.IntSlice(window).Sort()
-				return window[0] + window[w-1]
+		for i, sum := 0, 0; i+w < len(numbers); i++ {
+			if i == 0 {
+				for _, n := range numbers[i : i+w] {
+					sum += n
+				}
+			} else {
+				sum -= numbers[i-1]
+				sum += numbers[i+w-1]
+			}
+			if sum == search {
+				sort.IntSlice(numbers[i : i+w]).Sort()
+				return numbers[i] + numbers[i+w-1]
 			}
 		}
 	}
