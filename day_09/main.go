@@ -36,12 +36,12 @@ func part1() int {
 
 func part2(search int) int {
 	for w := 2; w < len(numbers); w++ {
-		for i, sum := 0, 0; i+w < len(numbers); i++ {
-			if i == 0 {
-				for _, n := range numbers[i : i+w] {
-					sum += n
-				}
-			} else {
+		sum := 0
+		for _, n := range numbers[:w] {
+			sum += n
+		}
+		for i := 0; i+w < len(numbers); i++ {
+			if i > 0 {
 				sum -= numbers[i-1]
 				sum += numbers[i+w-1]
 			}
