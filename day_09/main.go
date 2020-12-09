@@ -16,7 +16,7 @@ func part1() int {
 
 	var check = func(a []int, n int) bool {
 		for j := 0; j < w-1; j++ {
-			for k := j; k < w; k++ {
+			for k := j + 1; k < w; k++ {
 				if a[j]+a[k] == n {
 					return true
 				}
