@@ -13,15 +13,16 @@ type pos struct {
 
 var adjacent = []pos{{-1, -1}, {-1, 0}, {-1, 1}, {0, -1}, {0, 1}, {1, -1}, {1, 0}, {1, 1}}
 
-func count(grid [][]byte, i, j int, first bool) (res int) {
-	for _, rc := range adjacent {
+func count(grid [][]byte, i, j int, f bool) int {
+	res, n, m := 0, len(grid), len(grid[0])
+	for _, a := range adjacent {
 		y, x := i, j
 		for {
-			y, x = y+rc.y, x+rc.x
+			y, x = y+a.y, x+a.x
 			if y < 0 || x < 0 {
 				break
 			}
-			if y >= len(grid) || x >= len(grid[0]) {
+			if y >= n || x >= m {
 				break
 			}
 			if grid[y][x] == 'L' {
@@ -31,12 +32,12 @@ func count(grid [][]byte, i, j int, first bool) (res int) {
 				res += 1
 				break
 			}
-			if !first {
+			if !f {
 				break
 			}
 		}
 	}
-	return
+	return res
 }
 
 func occupied(grid [][]byte) (res int) {
@@ -78,30 +79,19 @@ func list(grid [][]byte, first bool) (taken, free []pos) {
 func conway(grid [][]byte, first bool) int {
 	before, after := 0, 1
 	for before != after {
-		before = after
 		taken, free := list(grid, first)
 		change(grid, taken, free)
-		after = occupied(grid)
+		before, after = after, occupied(grid)
 	}
 	return after
 }
 
-func duplicate(grid [][]byte) [][]byte {
-	res := make([][]byte, len(grid))
-	for i, row := range grid {
-		res[i] = make([]byte, len(row))
-		copy(res[i], row)
-	}
-	return res
+func getInput() [][]byte {
+	data, _ := ioutil.ReadFile("input.txt")
+	return bytes.Fields(data)
 }
 
 func main() {
-	data, _ := ioutil.ReadFile("input.txt")
-	grid := [][]byte{}
-	for _, row := range bytes.Fields(data) {
-		grid = append(grid, row)
-	}
-	clone := duplicate(grid)
-	fmt.Println("part 1:", conway(grid, false))
-	fmt.Println("part 2:", conway(clone, true))
+	fmt.Println("part 1:", conway(getInput(), false))
+	fmt.Println("part 2:", conway(getInput(), true))
 }
