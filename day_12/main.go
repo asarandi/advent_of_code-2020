@@ -3,18 +3,11 @@ package main
 
 import (
 	"fmt"
+	"image"
 	"io/ioutil"
 	"strconv"
 	"strings"
 )
-
-type point struct {
-	y, x int
-}
-
-func (p point) add(q point) point {
-	return point{p.y + q.y, p.x + q.x}
-}
 
 func abs(n int) int {
 	if n < 0 {
@@ -26,11 +19,11 @@ func abs(n int) int {
 var (
 	puzzle = []string{}
 	turns  = map[string]int{"L90": 3, "L180": 2, "L270": 1, "R90": 1, "R180": 2, "R270": 3}
-	dirs   = []point{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+	dirs   = []image.Point{{0, -1}, {1, 0}, {0, 1}, {-1, 0}} /* URDL, NESW */
 )
 
 func part1() int {
-	p, d := point{}, 1
+	p, d := image.Point{}, 1
 	for _, s := range puzzle {
 		if _, ok := turns[s]; ok {
 			d = (d + turns[s]) % 4
@@ -41,20 +34,18 @@ func part1() int {
 			i = d
 		}
 		n, _ := strconv.Atoi(s[1:])
-		for ; n > 0; n-- {
-			p = p.add(dirs[i])
-		}
+		p = p.Add(dirs[i].Mul(n))
 	}
-	return abs(p.y) + abs(p.x)
+	return abs(p.Y) + abs(p.X)
 }
 
 func part2() int {
-	p, w := point{}, point{-1, 10}
-	rot := func(i int, p point) point {
-		return map[int]point{
-			1: point{p.x, -p.y},
-			2: point{-p.y, -p.x},
-			3: point{-p.x, p.y},
+	p, w := image.Point{}, image.Point{10, -1}
+	rot := func(i int, p image.Point) image.Point {
+		return map[int]image.Point{
+			1: image.Point{-p.Y, p.X},
+			2: image.Point{-p.X, -p.Y},
+			3: image.Point{p.Y, -p.X},
 		}[i]
 	}
 
@@ -64,18 +55,13 @@ func part2() int {
 			continue
 		}
 		n, _ := strconv.Atoi(s[1:])
-		i := strings.Index("NESW", s[:1])
-		if i != -1 {
-			for ; n > 0; n-- {
-				w = w.add(dirs[i])
-			}
+		if i := strings.Index("NESW", s[:1]); i != -1 {
+			w = w.Add(dirs[i].Mul(n))
 		} else {
-			for ; n > 0; n-- {
-				p = p.add(w)
-			}
+			p = p.Add(w.Mul(n))
 		}
 	}
-	return abs(p.y) + abs(p.x)
+	return abs(p.Y) + abs(p.X)
 }
 
 func main() {
