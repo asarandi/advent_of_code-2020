@@ -32,7 +32,6 @@ var (
 func part1() int {
 	p, d := point{}, 1
 	for _, s := range puzzle {
-		val, _ := strconv.Atoi(s[1:])
 		if _, ok := turns[s]; ok {
 			d = (d + turns[s]) % 4
 			continue
@@ -41,7 +40,8 @@ func part1() int {
 		if i == -1 {
 			i = d
 		}
-		for ; val > 0; val-- {
+		n, _ := strconv.Atoi(s[1:])
+		for ; n > 0; n-- {
 			p = p.add(dirs[i])
 		}
 	}
@@ -59,18 +59,18 @@ func part2() int {
 	}
 
 	for _, s := range puzzle {
-		val, _ := strconv.Atoi(s[1:])
 		if _, ok := turns[s]; ok {
 			w = rot(turns[s], w)
 			continue
 		}
+		n, _ := strconv.Atoi(s[1:])
 		i := strings.Index("NESW", s[:1])
 		if i != -1 {
-			for ; val > 0; val-- {
+			for ; n > 0; n-- {
 				w = w.add(dirs[i])
 			}
 		} else {
-			for ; val > 0; val-- {
+			for ; n > 0; n-- {
 				p = p.add(w)
 			}
 		}
