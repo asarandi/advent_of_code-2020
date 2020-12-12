@@ -16,22 +16,6 @@ func (p point) add(q point) point {
 	return point{p.y + q.y, p.x + q.x}
 }
 
-func (p point) r0() point {
-	return point{p.y, p.x}
-}
-
-func (p point) r90() point {
-	return point{p.x, -p.y}
-}
-
-func (p point) r180() point {
-	return point{-p.y, -p.x}
-}
-
-func (p point) r270() point {
-	return point{-p.x, p.y}
-}
-
 func abs(n int) int {
 	if n < 0 {
 		n = -n
@@ -39,65 +23,51 @@ func abs(n int) int {
 	return n
 }
 
-var puzzle = []string{}
-
-var turns = map[string]int{
-	"L90":  3,
-	"L180": 2,
-	"L270": 1,
-	"R90":  1,
-	"R180": 2,
-	"R270": 3,
-}
-
-var nesw = map[byte]point{
-	'N': {-1, 0},
-	'E': {0, 1},
-	'S': {1, 0},
-	'W': {0, -1},
-}
-
-var dirs = []byte{'N', 'E', 'S', 'W'}
-
-var rots = []func(point) point{point.r0, point.r90, point.r180, point.r270}
+var (
+	puzzle = []string{}
+	turns  = map[string]int{"L90": 3, "L180": 2, "L270": 1, "R90": 1, "R180": 2, "R270": 3}
+	dirs   = []point{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
+)
 
 func part1() int {
-	var (
-		p, q point
-		ok   bool
-		d    = 1
-	)
+	p, d := point{}, 1
 	for _, s := range puzzle {
-		key := s[0]
 		val, _ := strconv.Atoi(s[1:])
-		if _, ok = turns[s]; ok {
+		if _, ok := turns[s]; ok {
 			d = (d + turns[s]) % 4
 			continue
 		}
-		if q, ok = nesw[key]; !ok {
-			q = nesw[dirs[d]]
+		i := strings.Index("NESW", s[:1])
+		if i == -1 {
+			i = d
 		}
 		for ; val > 0; val-- {
-			p = p.add(q)
+			p = p.add(dirs[i])
 		}
 	}
 	return abs(p.y) + abs(p.x)
 }
 
 func part2() int {
-	var (
-		w    = point{-1, 10}
-		p, q point
-		ok   bool
-	)
+	p, w := point{}, point{-1, 10}
+	rot := func(i int, p point) point {
+		return map[int]point{
+			1: point{p.x, -p.y},
+			2: point{-p.y, -p.x},
+			3: point{-p.x, p.y},
+		}[i]
+	}
+
 	for _, s := range puzzle {
-		key := s[0]
 		val, _ := strconv.Atoi(s[1:])
-		if _, ok = turns[s]; ok {
-			w = rots[turns[s]](w)
-		} else if q, ok = nesw[key]; ok {
+		if _, ok := turns[s]; ok {
+			w = rot(turns[s], w)
+			continue
+		}
+		i := strings.Index("NESW", s[:1])
+		if i != -1 {
 			for ; val > 0; val-- {
-				w = w.add(q)
+				w = w.add(dirs[i])
 			}
 		} else {
 			for ; val > 0; val-- {
