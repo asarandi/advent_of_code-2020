@@ -12,14 +12,12 @@ type vec [4]int
 func neighbors(puzzle map[vec]int, n int) map[vec]int {
 	res := map[vec]int{}
 	for cube := range puzzle {
-		for i := 0; i < n; i++ {
+		for i := 1; i < n; i++ {
 			newCube := cube
 			for j, v := range []int{i % 3, i / 3 % 3, i / 9 % 3, i / 27} {
 				newCube[j] += []int{0, -1, 1}[v]
 			}
-			if newCube != cube {
-				res[newCube] += 1
-			}
+			res[newCube] += 1
 		}
 	}
 	return res
