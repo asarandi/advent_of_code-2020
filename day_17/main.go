@@ -28,14 +28,25 @@ var (
 func neighbors3i() map[vec3i]int {
 	res := map[vec3i]int{}
 	for k := range puzzle3i {
-		for _, x := range xyz {
-			for _, y := range xyz {
-				for _, z := range xyz {
-					c := vec3i{k.x + x, k.y + y, k.z + z}
-					if c != k {
-						res[c] += 1
-					}
-				}
+		for i := 0; i < 27; i++ {
+			x, y, z := xyz[i%3], xyz[i/3%3], xyz[i/9]
+			c := vec3i{k.x + x, k.y + y, k.z + z}
+			if c != k {
+				res[c] += 1
+			}
+		}
+	}
+	return res
+}
+
+func neighbors4i() map[vec4i]int {
+	res := map[vec4i]int{}
+	for k := range puzzle4i {
+		for i := 0; i < 81; i++ {
+			x, y, z, w := xyz[i%3], xyz[i/3%3], xyz[i/9%3], xyz[i/27]
+			c := vec4i{k.x + x, k.y + y, k.z + z, k.w + w}
+			if c != k {
+				res[c] += 1
 			}
 		}
 	}
@@ -56,29 +67,6 @@ func part1() int {
 		puzzle3i = nextgen
 	}
 	return len(puzzle3i)
-}
-
-/*
-*
- */
-
-func neighbors4i() map[vec4i]int {
-	res := map[vec4i]int{}
-	for k := range puzzle4i {
-		for _, x := range xyz {
-			for _, y := range xyz {
-				for _, z := range xyz {
-					for _, w := range xyz {
-						c := vec4i{k.x + x, k.y + y, k.z + z, k.w + w}
-						if c != k {
-							res[c] += 1
-						}
-					}
-				}
-			}
-		}
-	}
-	return res
 }
 
 func part2() int {
