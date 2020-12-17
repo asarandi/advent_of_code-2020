@@ -7,95 +7,52 @@ import (
 	"io/ioutil"
 )
 
-type vec3i struct {
-	x, y, z int
-}
+type vec [4]int
 
-type vec4i struct {
-	x, y, z, w int
-}
-
-var (
-	xyz      = []int{-1, 0, 1}
-	puzzle3i = map[vec3i]int{}
-	puzzle4i = map[vec4i]int{}
-)
-
-/*
-*   TODO: remove repetitive code
- */
-
-func neighbors3i() map[vec3i]int {
-	res := map[vec3i]int{}
-	for k := range puzzle3i {
-		for i := 0; i < 27; i++ {
-			x, y, z := xyz[i%3], xyz[i/3%3], xyz[i/9]
-			c := vec3i{k.x + x, k.y + y, k.z + z}
-			if c != k {
-				res[c] += 1
+func neighbors(puzzle map[vec]int, n int) map[vec]int {
+	res := map[vec]int{}
+	for cube := range puzzle {
+		for i := 0; i < n; i++ {
+			newCube := cube
+			for j, v := range []int{i % 3, i / 3 % 3, i / 9 % 3, i / 27} {
+				newCube[j] += []int{0, -1, 1}[v]
+			}
+			if newCube != cube {
+				res[newCube] += 1
 			}
 		}
 	}
 	return res
 }
 
-func neighbors4i() map[vec4i]int {
-	res := map[vec4i]int{}
-	for k := range puzzle4i {
-		for i := 0; i < 81; i++ {
-			x, y, z, w := xyz[i%3], xyz[i/3%3], xyz[i/9%3], xyz[i/27]
-			c := vec4i{k.x + x, k.y + y, k.z + z, k.w + w}
-			if c != k {
-				res[c] += 1
-			}
-		}
-	}
-	return res
-}
-
-func part1() int {
+func solve(puzzle map[vec]int, n int) int {
 	for i := 0; i < 6; i++ {
-		nextgen := map[vec3i]int{}
-		for k, v := range neighbors3i() {
-			_, exists := puzzle3i[k]
+		nextgen := map[vec]int{}
+		for k, v := range neighbors(puzzle, n) {
+			_, exists := puzzle[k]
 			if v == 2 && exists {
 				nextgen[k] = 0
 			} else if v == 3 {
 				nextgen[k] = 0
 			}
 		}
-		puzzle3i = nextgen
+		puzzle = nextgen
 	}
-	return len(puzzle3i)
-}
-
-func part2() int {
-	for i := 0; i < 6; i++ {
-		nextgen := map[vec4i]int{}
-		for k, v := range neighbors4i() {
-			_, exists := puzzle4i[k]
-			if v == 2 && exists {
-				nextgen[k] = 0
-			} else if v == 3 {
-				nextgen[k] = 0
-			}
-		}
-		puzzle4i = nextgen
-	}
-	return len(puzzle4i)
+	return len(puzzle)
 }
 
 func main() {
 	data, _ := ioutil.ReadFile("input.txt")
 	grid := bytes.Split(data, []byte("\n"))
+	one, two := map[vec]int{}, map[vec]int{}
 	for x := range grid {
 		for y := range grid[x] {
 			if grid[x][y] == '#' {
-				puzzle3i[vec3i{x, y, 0}] = 0
-				puzzle4i[vec4i{x, y, 0, 0}] = 0
+				one[vec{x, y, 0, 0}] = 0
+				two[vec{x, y, 0, 0}] = 0
 			}
 		}
 	}
-	fmt.Println("part 1:", part1())
-	fmt.Println("part 1:", part2())
+	fmt.Println("part 1:", solve(one, 27))
+	fmt.Println("part 2:", solve(two, 81))
 }
