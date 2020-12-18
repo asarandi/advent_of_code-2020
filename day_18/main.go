@@ -27,9 +27,7 @@ func eval(s string, prio bool) int {
 	i := 1
 	for i = range tok {
 		if tok[i] == "+" || tok[i] == "*" {
-			if prio && tok[i] == "+" {
-				break
-			} else if !prio {
+			if !prio || tok[i] == "+" {
 				break
 			}
 		}
