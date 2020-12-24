@@ -66,11 +66,14 @@ func part2() int {
 			for _, s := range steps {
 				ct[tiles[k.Add(s)]]++
 			}
-			if v == 1 && (ct[1] == 0 || ct[1] > 2) {
-				v ^= 1
-			}
-			if v == 0 && ct[1] == 2 {
-				v ^= 1
+			if v == 1 {
+				if ct[1] == 0 || ct[1] > 2 {
+					v ^= 1
+				}
+			} else {
+				if ct[1] == 2 {
+					v ^= 1
+				}
 			}
 			nextgen[k] = v
 		}
