@@ -21,15 +21,15 @@ var (
 	}
 )
 
-func count() int {
-	res := 0
+func count() uint {
+	var res uint
 	for _, v := range tiles {
-		res += int(v)
+		res += v
 	}
 	return res
 }
 
-func part1() int {
+func part1() uint {
 	for _, line := range input {
 		t := image.Point{}
 		for i := 0; i < len(line); {
@@ -46,7 +46,7 @@ func part1() int {
 	return count()
 }
 
-func part2() int {
+func part2() uint {
 	for i := 0; i < 100; i++ {
 		missing := map[image.Point]uint{}
 		for k, v := range tiles {
@@ -62,18 +62,13 @@ func part2() int {
 		}
 		nextgen := map[image.Point]uint{}
 		for k, v := range tiles {
-			ct := []uint{0, 0}
+			var u uint
 			for _, s := range steps {
-				ct[tiles[k.Add(s)]]++
+				u += tiles[k.Add(s)]
 			}
-			if v == 1 {
-				if ct[1] == 0 || ct[1] > 2 {
-					v ^= 1
-				}
-			} else {
-				if ct[1] == 2 {
-					v ^= 1
-				}
+			if (v == 1 && (u == 0 || u > 2)) ||
+				(v == 0 && u == 2) {
+				v ^= 1
 			}
 			nextgen[k] = v
 		}
